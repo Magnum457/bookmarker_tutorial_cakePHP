@@ -84,7 +84,7 @@ $routes->scope('/', function (RouteBuilder $builder) {
      */
 
     $builder->scope('/bookmarks', function (RouteBuilder $builder) {
-        $builder->connect('/tagged/*', ['.controller' => 'Bookmarks', 'action' => 'tags']);
+        $builder->connect('/tagged/*', ['controller' => 'Bookmarks', 'action' => 'tags']);
     });
 
     $builder->fallbacks();

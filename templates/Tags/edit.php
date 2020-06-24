@@ -23,7 +23,6 @@
                 <legend><?= __('Edit Tag') ?></legend>
                 <?php
                     echo $this->Form->control('title');
-                    echo $this->Form->control('bookmarks._ids', ['options' => $bookmarks]);
                 ?>
             </fieldset>
             <?= $this->Form->button(__('Submit')) ?>
