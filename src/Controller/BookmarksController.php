@@ -18,6 +18,7 @@ class BookmarksController extends AppController
      */
     public function index()
     {
+        $this->Authorization->skipAuthorization();
         $this->paginate = [
             'contain' => ['Users'],
         ];
@@ -35,6 +36,7 @@ class BookmarksController extends AppController
      */
     public function view($id = null)
     {
+        $this->Authorization->skipAuthorization();
         $bookmark = $this->Bookmarks->get($id, [
             'contain' => ['Users', 'Tags'],
         ]);
@@ -50,8 +52,12 @@ class BookmarksController extends AppController
     public function add()
     {
         $bookmark = $this->Bookmarks->newEmptyEntity();
+        $this->Authorization->authorize($bookmark);
         if ($this->request->is('post')) {
             $bookmark = $this->Bookmarks->patchEntity($bookmark, $this->request->getData());
+
+            // Changed: Set the user_id from the current user.
+            $bookmark->user_id = $this->request->getAttribute('identity')->getIdentifier();
             if ($this->Bookmarks->save($bookmark)) {
                 $this->Flash->success(__('The bookmark has been saved.'));
 
@@ -76,10 +82,13 @@ class BookmarksController extends AppController
         $bookmark = $this->Bookmarks->get($id, [
             'contain' => ['Tags'],
         ]);
+        $this->Authorization->authorize($bookmark);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $bookmark = $this->Bookmarks->patchEntity($bookmark, $this->request->getData());
+            $bookmark = $this->Bookmarks->patchEntity($bookmark, $this->request->getData(), [
+                'acessibleFields' => ['user_id' => false]
+            ]);
             if ($this->Bookmarks->save($bookmark)) {
-                $this->Flash->success(__('The bookmark has been saved.'));
+                $this->Flash->success(__('The bookmark has been updated.'));
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -101,6 +110,7 @@ class BookmarksController extends AppController
     {
         $this->request->allowMethod(['post', 'delete']);
         $bookmark = $this->Bookmarks->get($id);
+        $this->Authorization->authorize($bookmark);
         if ($this->Bookmarks->delete($bookmark)) {
             $this->Flash->success(__('The bookmark has been deleted.'));
         } else {
@@ -111,6 +121,7 @@ class BookmarksController extends AppController
     }
     public function tags()
     {
+        $this->Authorization->skipAuthorization();
         // The 'pass' key is provided by CakePHP and contains all
         // the passed URL path segments in the request.
         $tags = $this->request->getParam('pass');

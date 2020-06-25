@@ -18,6 +18,7 @@ class TagsController extends AppController
      */
     public function index()
     {
+        $this->Authorization->skipAuthorization();
         $tags = $this->paginate($this->Tags);
 
         $this->set(compact('tags'));
@@ -32,6 +33,7 @@ class TagsController extends AppController
      */
     public function view($id = null)
     {
+        $this->Authorization->skipAuthorization();
         $tag = $this->Tags->get($id, [
             'contain' => ['Bookmarks'],
         ]);
